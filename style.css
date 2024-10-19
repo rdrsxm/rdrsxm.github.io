@@ -1,0 +1,468 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+::-moz-selection { /* Code for Firefox */
+    background: var(--accentColor);
+  }
+  
+  ::selection {
+    background: var(--accentColor);
+  }
+
+html, body {
+    height: 100%; 
+    font-family: "JetBrains Mono", monospace;}
+
+:root {
+    --bodyBackgroundColor: #C5C3C6;
+    --bodyBackgroundColorDark: #121212;
+    --mainContainerBackgroundColor: #DCDCDD;
+    --mainContainerBackgroundColorDark: #1d1d1d;
+    --textColor: #46494C;
+    --textColorDark: #C5C3C6;
+    --accentColor: #BCAC98;
+    --accentColorDark: #82776b;
+    --hoverTextColor: #000000;
+    --hoverTextColorDark: #ffffff;
+    --hoverTextColorButton: #ffffff;
+
+    --accentColorHover: #9d9180;
+    --accentColorHoverDark: #4d463f;
+
+
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Altezza minima uguale all'altezza della finestra */
+    background-color: var(--bodyBackgroundColor);
+    margin: 0;
+    transition: 0.75s;
+    color: var(--textColor)
+}
+
+.mainContainer {
+    background-color: var(--mainContainerBackgroundColor);
+    padding: 1.5em 3em 1.5em 3em;
+    max-width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    min-width: 450px;
+    overflow: hidden;
+    transition: 0.75s;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.156);
+
+
+}
+
+@media screen and (min-width: 768px) {
+    body {
+        padding: 0 15%;
+    }
+
+    .mainContainer {
+        padding: 3em 5em 1em 5em;
+        max-width: 800px;
+    }
+}
+
+h1{
+    margin: 0 1em 1em 1em;
+    transition: 0.25s;
+
+}
+
+.buttonContainer{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    align-self: center;
+    width: 100%;
+    margin: auto;
+    justify-content: space-around;
+}
+
+.passwordGeneratorContainer{
+    width: 90%;
+    margin: 3em;
+}
+
+.passwordOutput{
+    background: none;
+    border: 0.5px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.4em;
+    padding: 0.75em;
+    font-size: 1.5em;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 200;
+    width: 94%;
+    text-align: center;
+    background-color: #c5c3c643;
+    margin-bottom: 0.5em;
+    color: var(--textColor);
+    transition: 0.75s;
+
+
+}
+
+.passwordOutput:focus{
+    background: none;
+    border: 0.5px solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.4em;
+    padding: 0.75em;
+    font-size: 1.5em;
+    font-family: "JetBrains Mono", monospace;
+    font-weight: 200;
+    width: 94%;
+    text-align: center;
+    background-color: #c5c3c643;
+    outline: none;
+}
+
+.button{
+    background-color: var(--accentColor);
+    color: var(--textColor);
+    margin: 1em 0 1em 0;
+    padding: 1em;
+    border-radius: 0.4em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    font-size: 1em;
+    width: 44%;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 500ms;
+     /* impedire select */   
+    -webkit-user-select: none;     
+    -moz-user-select: none; 
+    -ms-user-select: none;
+    user-select: none;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.156);
+
+
+}
+
+.button:hover{
+    background-color: var(--accentColorHover);
+    color: var(--hoverTextColorButton);
+    margin: 1em 0 1em 0;
+    padding: 1em;
+    border-radius: 0.4em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    font-size: 1em;
+    width: 44%;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 300ms;
+}
+
+
+
+i{
+    align-self: center;
+}
+
+.passwordLengthContainer{
+    width: 98%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    align-self: center;
+    padding: 0.5em;
+     /* impedire select */   
+     -webkit-user-select: none;     
+     -moz-user-select: none; 
+     -ms-user-select: none;
+     user-select: none;
+}
+
+.passwordLengthSelector{
+   display: flex; 
+   transition: 500ms;
+
+}
+
+.passwordLengthText{
+    display: flex; 
+    color: var(--textColor);
+    transition: 500ms;
+
+}
+
+.passwordLengthNumber{
+    display: flex; 
+    text-align: center;
+    justify-content: center;
+    border-radius: 0.4em;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.258);
+    backdrop-filter: blur(10.3px);
+    -webkit-backdrop-filter: blur(10.3px);
+    padding: 0.25em;
+    margin-left: 0.75em;
+    border-radius: 0.4em;
+    width: 2.5em;
+    color: var(--textColor);
+    transition: 500ms;
+}
+
+.passwordLengthSelector{
+    -webkit-appearance: none;
+    appearance: none;
+    height: 0.75em; /* Specified height */
+    background: var(--bodyBackgroundColor); /* Grey background */
+    outline: none; /* Remove outline */
+    opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+    -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+    transition: opacity .2s;
+    margin: 1em;
+    border-radius: 1em;
+    width: fit-content;
+    transition: 500ms;
+
+}   
+
+.passwordLengthSelector::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 10px;
+    background-color: var(--accentColor);
+    overflow: visible;
+    cursor: pointer;
+  }
+
+.randomLengthButton{
+    display: flex; 
+    text-align: center;
+    justify-content: center;
+    background-color: var(--accentColor);
+    border-radius: 0.4em;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10.3px);
+    -webkit-backdrop-filter: blur(10.3px);
+    padding: 0.5em;
+    margin-left: 0.5em;
+    border: none;
+    border-radius: 0.4em;
+    color: var(--textColor);
+    cursor: pointer;
+    transition: 0.5s;
+    width: 2.5em;
+    
+}
+
+
+.randomLengthButton:hover{
+    background-color: #70675c;
+    transition: 0.25s;
+    color: var(--hoverTextColorButton)
+}
+
+.singleSelector{
+    display: flex;
+    flex-direction: row;
+    accent-color: var(--accentColor);
+    /* impedire select */   
+    -webkit-user-select: none;     
+    -moz-user-select: none; 
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.singleSelector p{
+    font-size: 0.9em;
+    margin-left: 0.75em;
+    cursor: pointer;
+    color: var(--textColor);
+    transition: 250ms;
+}
+
+
+.singleSelector p:hover{
+    font-size: 0.9em;
+    margin-left: 0.75em;
+    cursor: pointer;
+    transition: 150ms;
+}
+
+
+.selectorsContainer{
+    width: 100%;
+    margin: auto;
+    margin-top: 1em;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
+    align-self: center;
+    align-items: baseline;
+    padding: 0.5em;
+    font-size: 1em;
+}
+
+.singleSelector:hover p{
+    color: var(--hoverTextColor);
+    transform: translateX(5px);
+}
+
+.singleSelector:hover .checkbox{
+    background-color:#9d9180;
+}
+
+.checkbox{
+    padding: 0.35em;
+    background-color: var(--accentColor);
+    font-size: 1em;
+    margin: 0.25em 1em 1em -0.5em;
+    cursor: pointer;
+    transition: 150ms;
+    border-radius: 0.15em;
+    transition: 500ms;
+
+}
+
+.checkbox:hover{
+    padding: 0.35em;
+    background-color:rgba(188, 172, 152, 0.239);
+    font-size: 1em;
+    transition: 150ms;
+}
+
+.password{
+    /* Colore testo normale */  color: #46494C;
+    /* Colore testo not av. */  color: #46494c74;
+    /* Colore checkbox      */  color: #BCAC98;
+    /* Colore checkbox no   */  color: #bdad9971;
+}
+
+.notification {
+    position: fixed;
+    visibility: hidden;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accentColor);
+    color: white; 
+    padding: 1em 2em 1em 2em ;
+    border-radius: 0.4em; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0; 
+    font-weight: 400;
+    min-width: 368px;
+    transition: 1s;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) translateX(-50%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateX(-50%);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) translateX(-50%); 
+    }
+    to {
+        
+        opacity: 0;
+        transform: translateY(20px) translateX(-50%);
+    }
+}
+
+.madeWithHeart{
+    display: flex;
+    position: fixed;
+    bottom: 20px;
+    font-size: 0.75em;
+    color: var(--textColor);
+    opacity: 0.175;
+    font-weight: 100;
+    transition: 500ms;
+
+}
+
+a {
+    color:inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+a:hover {
+    color: inherit; 
+    text-decoration: none;
+}
+
+.checked:hover p{
+    color: var(--textColor);
+}
+
+.checked:hover .checkbox{
+    background-color:var(--accentColor);
+}
+
+
+
+hr{
+    width: 90%;
+    margin: 2em;
+    opacity: 0.098;
+    border: 0.25px var(--textColor) solid;
+    border-radius: 1em;
+    background: none;
+    align-self: baseline;
+}
+
+
+.checkBoxDarkMode{
+    font-size: 0.85em;
+    margin: 0em 1em 1em -0.5em;
+    cursor: pointer;
+    transition: 150ms;
+    color: var(--accentColor);
+    text-align: center;
+    transition: 0.5s;
+    width: 1em;
+}
+
+.animateDarkModeIcon{
+    animation: circleDarkModeIcon 1s ease-in-out;
+}
+
+@keyframes circleDarkModeIcon {
+    from {
+        transform: rotate(0deg); 
+    }
+    to{
+        transform: rotate(360deg); 
+    }
+}
+
+#labelDarkMode{
+    color: var(--textColor);
+    opacity: 0.5;
+    transition: 0.5s ;
+}
+
+#containerDarkMode{
+    font-size: 1em;
+    text-align: center;
+}

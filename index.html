@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>password generator</title>
+    <script src="https://kit.fontawesome.com/5abaa90124.js" crossorigin="anonymous"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.svg">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+    <div class="mainContainer" id="mainContainer">
+        <h1>password generator</h1>
+        <p style = "font-weight: 200;">create secure and unique passwords, instantly.</p>
+
+        <div class="passwordGeneratorContainer">
+            <input type="text" readonly class="passwordOutput" maxlength="30" id="passwordOutput">
+
+            
+
+            <div class = "buttonContainer">
+                <div class="button" id = "generate"  onclick="generatePassword()">
+                    <i class="fa-solid fa-repeat"></i>
+                    <p>generate</p>
+                </div>
+
+                <div class="button" id = "copy" onclick = "copyToClipboard()">
+                    <i class="fa-solid fa-copy"></i>
+                    <p>copy</p>
+                </div>
+            </div>
+
+            <div class="passwordLengthContainer">
+                <p class="passwordLengthText">length</p>
+                <input type="range" min="8" max="24" class="passwordLengthSelector" id="passwordLengthSelector"/>
+                <p class="passwordLengthNumber" id="passwordLengthNumber">16</p>
+                <div class="randomLengthButton" id="randomLengthButton" onclick="setRandomPasswordLength()"><i class="fa-solid fa-shuffle"></i></div>
+            </div>
+
+            <div class="selectorsContainer">
+                <div class="singleSelector" id="containerUpperscaleLetters" onclick="toggleUseUppercaseLetters()">
+                    <span class="checkbox" id="checkboxUppercaseLetters"></span>
+                    <p id="labelUppercaseLetters">use uppercase letters</p>
+                </div>
+                <div class="singleSelector"  id="containerLowerscaleLetters" onclick="toggleUseLowercaseLetters()">
+                    <span class="checkbox" id="checkboxLowercaseLetters"></span>
+                    <p id="labelLowercaseLetters">use lowercase letters</p>
+                </div>
+                <div class="singleSelector"  id="containerNumbers" onclick="toggleUseNumbers()">
+                    <span class="checkbox" id="checkboxNumbers"></span>
+                    <p  id="labelNumbers">use numbers</p>
+                </div>
+                <div class="singleSelector" id="containerSymbols"  onclick="toggleUseSymbols()">
+                    <span class="checkbox" id="checkboxSymbols"></span>
+                    <p id="labelSymbols">use symbols</p>
+                </div>
+                <hr>
+                <div class="singleSelector" id="containerDarkMode" onclick="toggleDarkMode()">
+                    <span  class="checkBoxDarkMode" id="checkBoxDarkMode"><i class="fa-solid fa-moon"></i></span>
+                    <p id="labelDarkMode">dark mode</p>
+                </div>
+            </div>
+
+
+
+        <div class = "madeWithHeart">
+            <p>v 1.0, made with</p>&nbsp;
+            <i class="fa-regular fa-heart"></i>&nbsp;
+            <p>by francesco rottigni @rdrsxm</p>
+        </div>
+        <div class="notification" id = "notification"><i class='fa-solid fa-circle-check'></i>&nbsp; password copied to clipboard</div>
+
+    </div>
+
+    <script src="main.js"></script>
+
+</body>
+</html>
