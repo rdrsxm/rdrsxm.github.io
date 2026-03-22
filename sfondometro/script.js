@@ -10,10 +10,15 @@ const STORAGE_COUNTS = 'sfondometro_counts';
 
 const DEFAULT_TYPES = [
   { id: 'nigiri', name: 'Nigiri', emoji: '🍣' },
-  { id: 'sashimi', name: 'Sashimi', emoji: '🐟' },
-  { id: 'uramaki', name: 'Uramaki', emoji: '🍘' },
-  { id: 'temaki', name: 'Temaki', emoji: '🥢' },
-  { id: 'gunkan', name: 'Gunkan', emoji: '🦐' },
+  { id: 'sashimi', name: 'Sashimi', emoji: '🥓' },
+  { id: 'uramaki', name: 'Uramaki', emoji: '🍤' },
+  { id: 'temaki', name: 'Temaki', emoji: '🌯' },
+  { id: 'gunkan', name: 'Gunkan', emoji: '🍥' },
+  { id: 'futomaki', name: 'Futomaki', emoji: '🍘' },
+  { id: 'gyoza', name: 'Gyoza', emoji: '🥟' },
+  { id: 'tartare', name: 'Tartare', emoji: '🐟' },
+  { id: 'spiedino', name: 'Spiedino', emoji: '🍢' },
+  { id: 'dolcetto', name: 'Dolcetto', emoji: '🧁' },
 ];
 
 let types = [];
@@ -110,7 +115,7 @@ function render() {
   const add = document.createElement('div');
   add.className = 'add-card';
   add.onclick = openModal;
-  add.innerHTML = '<div class="plus-icon">＋</div><span>Aggiungi</span>';
+  add.innerHTML = '<div class="plus-icon">＋</div>';
   grid.appendChild(add);
 }
 
@@ -215,7 +220,7 @@ function renderHistory() {
   const dates = Object.keys(counts).sort().reverse();
 
   if (dates.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-emoji">🍽️</div><p>Nessun dato ancora.<br>Inizia a contare i tuoi sushi!</p></div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-emoji">🍽️</div><p>Ancora niente. Mangia qualcosa!</p></div>';
     return;
   }
 
