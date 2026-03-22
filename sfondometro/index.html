@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Sfondometro</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="header">
+  <h1>🍣 Sfondometro</h1>
+  <button class="header-btn" onclick="openModal()" aria-label="Aggiungi tipo">＋</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="counter" onclick="switchTab('counter')">Contatore</button>
+  <button class="tab" data-tab="history" onclick="switchTab('history')">Storico</button>
+</div>
+
+<div id="page-counter" class="page active">
+  <div class="total-banner">
+    <div class="label">Hai mangiato</div>
+    <div class="count" id="today-total">0</div>
+    <div class="sub">pezzi di sushi</div>
+  </div>
+
+  <div class="date-selector" style="display: none">
+    <button onclick="changeDate(-1)">◀</button>
+    <span id="current-date"></span>
+    <button onclick="changeDate(1)">▶</button>
+  </div>
+
+  <div class="sushi-grid" id="sushi-grid"></div>
+</div>
+
+<div id="page-history" class="page">
+  <div id="history-list"></div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Nuovo tipo di sushi</h2>
+    <label>Nome</label>
+    <input type="text" id="input-name" placeholder="Es. Nigiri salmone" maxlength="24">
+    <label>Icona</label>
+    <div class="emoji-grid" id="emoji-grid"></div>
+    <button class="modal-submit" id="btn-add" onclick="addType()" disabled>Aggiungi</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
