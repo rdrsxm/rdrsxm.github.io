@@ -103,7 +103,7 @@ els.authForm.addEventListener('submit', (e) => {
     const password = els.passwordInput.value;
 
     els.authBtn.disabled = true;
-    els.authBtn.innerText = "Please wait...";
+    els.authBtn.innerText = "One sec...";
     els.authError.innerText = "";
 
     if (state.authMode === 'login') {
@@ -125,11 +125,11 @@ function handleAuthError(error) {
         (typeof msg === 'string' && msg.includes('INVALID_LOGIN_CREDENTIALS'));
 
     if (isInvalidCreds) {
-        msg = "Incorrect email or password.";
+        msg = "Credentials are incorrect, please try again.";
     } else if (error.code === 'auth/invalid-email') {
-        msg = "Invalid email address.";
+        msg = "Email is incorrect, please try again.";
     } else if (error.code === 'auth/email-already-in-use') {
-        msg = "An account already exists with this email.";
+        msg = "You already have an account! Try signing in instead.";
     } else if (typeof msg === 'string' && msg.includes('{')) {
         // If it's still a raw JSON string for some other error, try to parse or just give a generic message
         try {
@@ -142,18 +142,18 @@ function handleAuthError(error) {
 
     els.authError.innerText = msg;
     els.authBtn.disabled = false;
-    els.authBtn.innerText = state.authMode === 'login' ? 'Sign In' : 'Sign Up';
+    els.authBtn.innerText = state.authMode === 'login' ? 'Login' : 'Sign up';
 }
 
 const app = {
     toggleAuthMode: function () {
         state.authMode = state.authMode === 'login' ? 'signup' : 'login';
         if (state.authMode === 'login') {
-            els.authBtn.innerText = 'Sign In';
-            els.authToggle.innerHTML = 'Need an account? <span onclick="app.toggleAuthMode()">Sign Up</span>';
+            els.authBtn.innerText = 'Login';
+            els.authToggle.innerHTML = 'First time here? <span onclick="app.toggleAuthMode()">Sign up!</span>';
         } else {
-            els.authBtn.innerText = 'Sign Up';
-            els.authToggle.innerHTML = 'Already have an account? <span onclick="app.toggleAuthMode()">Sign In</span>';
+            els.authBtn.innerText = 'Sign up';
+            els.authToggle.innerHTML = 'Do you already have an account? <span onclick="app.toggleAuthMode()">Welcome back!</span>';
         }
     },
 
@@ -191,7 +191,7 @@ const app = {
                 const data = JSON.parse(e.target.result);
                 if (!data.addictions || !data.checkins) throw new Error("Invalid file format. Missing trackers or check-ins.");
 
-                if (!confirm(`Are you sure you want to import ${data.addictions.length} trackers and ${data.checkins.length} check-ins? Existing trackers with the same IDs will be overwritten.`)) {
+                if (!confirm(`Ready to restore ${data.addictions.length} trackers and ${data.checkins.length} check-ins? Your existing data with matching IDs will be updated.`)) {
                     event.target.value = '';
                     return;
                 }
@@ -212,7 +212,7 @@ const app = {
                 });
 
                 await batch.commit();
-                alert("Import successful! The dashboard will now update.");
+                alert("Welcome back! Everything's been restored.");
                 this.closeModal('settings-modal');
                 event.target.value = '';
             } catch (error) {
@@ -226,8 +226,40 @@ const app = {
     // ==========================================
     // 3. NAVIGATION & MODALS
     // ==========================================
-    showAddTrackerModal: function () {
-        document.getElementById('add-tracker-modal').classList.add('open');
+    showAddTrackerModal: function (trackerId = null) {
+        const modal = document.getElementById('add-tracker-modal');
+        const form = document.getElementById('add-tracker-form');
+
+        form.reset();
+
+        if (trackerId) {
+            const tracker = state.addictions.find(a => a.id === trackerId);
+            if (!tracker) return;
+
+            document.getElementById('add-tracker-title').innerText = "Edit tracker";
+            document.getElementById('add-tracker-submit').innerText = "Save changes";
+            document.getElementById('tracker-edit-id').value = trackerId;
+
+            document.getElementById('tracker-name').value = tracker.name;
+
+            const date = new Date(tracker.startDate);
+            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+            document.getElementById('tracker-date').value = date.toISOString().slice(0, 16);
+
+            document.querySelectorAll('#tracker-icon-selector .icon-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-icon') === tracker.icon);
+            });
+        } else {
+            document.getElementById('add-tracker-title').innerText = "New chapter";
+            document.getElementById('add-tracker-submit').innerText = "Let's do this 💪";
+            document.getElementById('tracker-edit-id').value = "";
+
+            document.querySelectorAll('#tracker-icon-selector .icon-btn').forEach((btn, index) => {
+                btn.classList.toggle('active', index === 0);
+            });
+        }
+
+        modal.classList.add('open');
 
         // Auto-focus after modal animation
         setTimeout(() => {
@@ -241,14 +273,22 @@ const app = {
         document.getElementById('tracker-date').value = now.toISOString().slice(0, 16);
     },
 
+    setCheckinDateToNow: function () {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('checkin-date').value = now.toISOString().slice(0, 16);
+    },
+
     showAddCheckInModal: function () {
         if (state.addictions.length === 0) {
-            alert("Please add a tracker first!");
+            alert("Let's set up a tracker first.");
             return;
         }
 
         const select = document.getElementById('checkin-tracker-select');
         select.innerHTML = state.addictions.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
+
+        this.setCheckinDateToNow();
 
         document.getElementById('add-checkin-modal').classList.add('open');
     },
@@ -282,14 +322,14 @@ const app = {
     },
 
     deleteCheckin: function (id) {
-        if (!confirm("Are you sure you want to delete this check-in?")) return;
+        if (!confirm("Remove this check-in?")) return;
         state.db.collection('users').doc(state.user.uid).collection('checkins').doc(id).delete()
             .then(() => console.log("Check-in deleted"))
             .catch(err => console.error("Error deleting check-in:", err));
     },
 
     deleteAddiction: function (id) {
-        if (!confirm("Are you sure you want to delete this tracker?")) return;
+        if (!confirm("Remove this tracker?")) return;
         state.db.collection('users').doc(state.user.uid).collection('addictions').doc(id).update({
             isActive: false
         }).then(() => console.log("Tracker deactivated"))
@@ -303,15 +343,17 @@ const app = {
         if (didRelapse) {
             document.getElementById('status-setback').classList.add('active');
             document.getElementById('status-ontrack').classList.remove('active');
+            document.getElementById('setback-message').style.display = 'block';
         } else {
             document.getElementById('status-ontrack').classList.add('active');
             document.getElementById('status-setback').classList.remove('active');
+            document.getElementById('setback-message').style.display = 'none';
         }
     },
 
     updateCravingLabel: function () {
         const val = parseInt(document.getElementById('checkin-cravings').value);
-        const labels = ["None", "Mild", "Moderate", "Strong", "Severe"];
+        const labels = ["Very little", "A little", "Moderately", "Strong", "Very strong"];
         document.getElementById('craving-label').innerText = labels[val - 1];
     },
 
@@ -330,12 +372,12 @@ const app = {
                         if (bannerToggleInput) bannerToggleInput.checked = true;
                     } else {
                         checkbox.checked = false;
-                        alert("Please allow notifications in your browser settings to use this feature.");
+                        alert("To get daily reminders, please allow notifications in your browser settings.");
                     }
                 });
             } else {
                 checkbox.checked = false;
-                alert("Your browser does not support notifications.");
+                alert("Your browser doesn't support notifications.");
             }
         } else {
             localStorage.setItem("klara_notifications_enabled", "false");
@@ -459,20 +501,20 @@ const app = {
             startDate = new Date(endDate);
             startDate.setDate(startDate.getDate() - 6);
 
-            if (this.heatmapOffset === 0) labelStr = 'This Week';
-            else if (this.heatmapOffset === 1) labelStr = 'Last Week';
+            if (this.heatmapOffset === 0) labelStr = 'This week';
+            else if (this.heatmapOffset === 1) labelStr = 'Last week';
             else labelStr = `${startDate.toLocaleDateString('en-GB')} - ${endDate.toLocaleDateString('en-GB')}`;
         } else if (this.heatmapView === 'month') {
             startDate = new Date(now.getFullYear(), now.getMonth() - this.heatmapOffset, 1);
             endDate = new Date(now.getFullYear(), now.getMonth() - this.heatmapOffset + 1, 0);
 
-            if (this.heatmapOffset === 0) labelStr = 'This Month';
+            if (this.heatmapOffset === 0) labelStr = 'This month';
             else labelStr = startDate.toLocaleDateString('en-GB', { month: '2-digit', year: 'numeric' });
         } else if (this.heatmapView === 'year') {
             startDate = new Date(now.getFullYear() - this.heatmapOffset, 0, 1);
             endDate = new Date(now.getFullYear() - this.heatmapOffset, 11, 31);
 
-            if (this.heatmapOffset === 0) labelStr = 'This Year';
+            if (this.heatmapOffset === 0) labelStr = 'This year';
             else labelStr = startDate.getFullYear().toString();
         }
 
@@ -556,7 +598,7 @@ function showMainView() {
     els.authView.classList.remove('active-view');
     els.mainView.classList.add('active-view');
     els.authBtn.disabled = false;
-    els.authBtn.innerText = state.authMode === 'login' ? 'Sign In' : 'Sign Up';
+    els.authBtn.innerText = state.authMode === 'login' ? 'Login' : 'Sign up!';
 
     const savedTime = localStorage.getItem("klara_notification_time") || "20:00";
     const notificationsEnabled = localStorage.getItem("klara_notifications_enabled") === "true";
@@ -629,22 +671,41 @@ document.getElementById('add-tracker-form').addEventListener('submit', (e) => {
     const activeIconBtn = document.querySelector('.icon-btn.active');
     const icon = activeIconBtn ? activeIconBtn.getAttribute('data-icon') : 'fa-leaf';
 
-    state.db.collection('users').doc(state.user.uid).collection('addictions').add({
-        name: name,
-        startDate: startDate,
-        icon: icon,
-        isActive: true,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        app.closeModal('add-tracker-modal');
-        document.getElementById('add-tracker-form').reset();
-        btn.disabled = false;
-        btn.innerText = originalText;
-    }).catch(err => {
-        console.error("Error adding tracker:", err);
-        btn.disabled = false;
-        btn.innerText = originalText;
-    });
+    const editId = document.getElementById('tracker-edit-id').value;
+
+    if (editId) {
+        state.db.collection('users').doc(state.user.uid).collection('addictions').doc(editId).update({
+            name: name,
+            startDate: startDate,
+            icon: icon
+        }).then(() => {
+            app.closeModal('add-tracker-modal');
+            document.getElementById('add-tracker-form').reset();
+            btn.disabled = false;
+            btn.innerText = "Let's do this 💪";
+        }).catch(err => {
+            console.error("Error updating tracker:", err);
+            btn.disabled = false;
+            btn.innerText = originalText;
+        });
+    } else {
+        state.db.collection('users').doc(state.user.uid).collection('addictions').add({
+            name: name,
+            startDate: startDate,
+            icon: icon,
+            isActive: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+            app.closeModal('add-tracker-modal');
+            document.getElementById('add-tracker-form').reset();
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }).catch(err => {
+            console.error("Error adding tracker:", err);
+            btn.disabled = false;
+            btn.innerText = originalText;
+        });
+    }
 });
 
 function fetchAddictions() {
@@ -706,19 +767,27 @@ document.getElementById('add-checkin-form').addEventListener('submit', (e) => {
     const addictionId = document.getElementById('checkin-tracker-select').value;
     const cravings = parseInt(document.getElementById('checkin-cravings').value);
     const didRelapse = (document.getElementById('add-checkin-form').dataset.relapse === 'true');
+    const checkinDateStr = document.getElementById('checkin-date').value;
+    const checkinDate = new Date(checkinDateStr).getTime();
 
     state.db.collection('users').doc(state.user.uid).collection('checkins').add({
         addictionId: addictionId,
-        date: new Date().getTime(),
+        date: checkinDate,
         cravingLevel: cravings,
         didRelapse: didRelapse
     }).then(() => {
+        if (didRelapse) {
+            state.db.collection('users').doc(state.user.uid).collection('addictions').doc(addictionId).update({
+                startDate: checkinDate
+            });
+        }
+
         app.closeModal('add-checkin-modal');
         document.getElementById('add-checkin-form').reset();
         app.setRelapse(false);
         app.updateCravingLabel();
         btn.disabled = false;
-        btn.innerText = originalText;
+        btn.innerText = "Log it ✓";
     }).catch(err => {
         console.error("Error adding check-in:", err);
         btn.disabled = false;
@@ -751,14 +820,17 @@ function renderDashboard() {
                         <h3>${addiction.name}</h3>
                         <p>Since ${new Date(addiction.startDate).toLocaleDateString('en-GB')}</p>
                     </div>
-                    <button class="delete-btn" onclick="app.deleteAddiction('${addiction.id}')"><i class="fa-solid fa-close"></i></button>
+                    <div style="display: flex;">
+                        <button class="edit-btn" onclick="app.showAddTrackerModal('${addiction.id}')"><i class="fa-solid fa-ellipsis"></i></button>
+                        <button class="delete-btn" onclick="app.deleteAddiction('${addiction.id}')"><i class="fa-solid fa-close"></i></button>
+                    </div>
                 </div>
                 
                 <div class="timer-display">
                     <div class="timer-halo"></div>
                     <div class="timer-main">
                         <div class="number" id="days-${addiction.id}">0</div>
-                        <div class="label" id="days-label-${addiction.id}">days free</div>
+                        <div class="label" id="days-label-${addiction.id}">days strong</div>
                     </div>
                     <div class="timer-sub">
                         <div class="timer-unit">
@@ -780,7 +852,7 @@ function renderDashboard() {
                 
                 <div class="milestone-info">
                     <div class="milestone-header">
-                        <span id="milestone-label-${addiction.id}" style="margin-right: 5px"><i class="fa-solid fa-flag"></i> Working toward next milestone</span>
+                        <span id="milestone-label-${addiction.id}" style="margin-right: 5px"><i class="fa-solid fa-flag"></i> Next win is on the horizon</span>
                         <span id="progress-pct-${addiction.id}">0%</span>
                     </div>
                     <div class="progress-track">
@@ -814,7 +886,7 @@ function updateTimers() {
         const daysEl = document.getElementById(`days-${addiction.id}`);
         if (daysEl) {
             daysEl.innerText = days;
-            document.getElementById(`days-label-${addiction.id}`).innerText = days === 1 ? 'day free' : 'days free';
+            document.getElementById(`days-label-${addiction.id}`).innerText = days === 1 ? 'day strong' : 'days strong';
 
             document.getElementById(`hrs-${addiction.id}`).innerText = String(hours).padStart(2, '0');
             document.getElementById(`mins-${addiction.id}`).innerText = String(minutes).padStart(2, '0');
@@ -832,7 +904,7 @@ function updateTimers() {
                 pct = Math.min(100, Math.max(0, ((daysSober - prevDays) / span) * 100));
             }
 
-            document.getElementById(`milestone-label-${addiction.id}`).innerHTML = `<i class="fa-solid fa-flag" style="margin-right: 5px"></i> Working toward ${nextMilestone.label}`;
+            document.getElementById(`milestone-label-${addiction.id}`).innerHTML = `<i class="fa-solid fa-flag" style="margin-right: 5px"></i> ${nextMilestone.label} is calling!`;
             document.getElementById(`progress-pct-${addiction.id}`).innerText = Math.floor(pct) + '%';
             document.getElementById(`progress-fill-${addiction.id}`).style.width = pct + '%';
         }
@@ -857,7 +929,7 @@ function renderCheckins() {
 
         const statusClass = checkin.didRelapse ? 'danger' : 'success';
         const statusIcon = checkin.didRelapse ? 'fa-rotate-left' : 'fa-circle-check';
-        const statusText = checkin.didRelapse ? 'Setback' : 'On track';
+        const statusText = checkin.didRelapse ? 'Had a setback' : 'On track';
 
         const tracker = state.addictions.find(a => a.id === checkin.addictionId);
         const trackerName = tracker ? tracker.name : 'Unknown';
@@ -874,7 +946,7 @@ function renderCheckins() {
                 </div>
                 <div class="checkin-details">
                     <div class="detail-pill"><i class="fa-solid ${statusIcon} icon-${statusClass}"></i> ${statusText}</div>
-                    <div class="detail-pill"><i class="fa-solid fa-fire"></i> Cravings: ${checkin.cravingLevel}/5</div>
+                    <div class="detail-pill"><i class="fa-solid fa-fire"></i> Cravings: ${checkin.cravingLevel}/5 🌊</div>
                 </div>
             </div>
         `;
@@ -965,7 +1037,7 @@ function renderMilestones() {
         } else {
             nextHtml = `
                 <div class="milestone-progress-info">
-                    <span class="days-label">Every milestone unlocked! 🎉</span>
+                    <span class="days-label">You've unlocked them all! You legend! 🎉</span>
                 </div>`;
         }
 
@@ -1013,7 +1085,6 @@ function renderMilestones() {
                     <div class="ms-icon"><i class="fa-solid ${msIcon}"></i></div>
                     <div class="ms-info">
                         <h4>${addiction.name}</h4>
-                        <span>${unlockedCount} of ${milestones.length} milestones</span>
                     </div>
                     <div class="milestone-trophy-chip">
                         <i class="fa-solid fa-trophy"></i> ${unlockedCount}
@@ -1044,11 +1115,11 @@ const urge = {
     breatheInterval: null,
 
     sensesData: [
-        { count: 5, sense: "see", prompt: "Name five things you can see right now.", icon: "fa-eye" },
-        { count: 4, sense: "feel", prompt: "Notice four things you can physically feel.", icon: "fa-hand-sparkles" },
-        { count: 3, sense: "hear", prompt: "Listen for three distinct sounds.", icon: "fa-ear-listen" },
-        { count: 2, sense: "smell", prompt: "Find two things you can smell.", icon: "fa-nose" },
-        { count: 1, sense: "taste", prompt: "Notice one thing you can taste.", icon: "fa-tooth" }
+        { count: 5, sense: "see", prompt: "Look around. What catches your eye?", icon: "fa-eye" },
+        { count: 4, sense: "feel", prompt: "What textures and sensations are around you right now?", icon: "fa-hand-sparkles" },
+        { count: 3, sense: "hear", prompt: "What sounds can you pick up?", icon: "fa-ear-listen" },
+        { count: 2, sense: "smell", prompt: "Can you smell anything interesting?", icon: "fa-nose" },
+        { count: 1, sense: "taste", prompt: "What's the taste in your mouth right now?", icon: "fa-tooth" }
     ],
     currentSenseIndex: 0,
     tappedSenses: 0,
@@ -1105,17 +1176,17 @@ const urge = {
         this.showView(exercise);
 
         if (exercise === 'senses') {
-            document.getElementById('urge-title').innerText = "Ground with your senses";
+            document.getElementById('urge-title').innerText = "Come back to your senses";
             this.currentSenseIndex = 0;
             this.tappedSenses = 0;
             this.renderSenses();
         } else if (exercise === 'surf') {
-            document.getElementById('urge-title').innerText = "Ride the urge out";
+            document.getElementById('urge-title').innerText = "Surf the wave";
             this.surfElapsed = 0;
             this.isSurfing = false;
             this.renderSurf();
         } else if (exercise === 'breathe') {
-            document.getElementById('urge-title').innerText = "Box breathing";
+            document.getElementById('urge-title').innerText = "Breathe in a box";
             this.startBreathe();
         }
     },
@@ -1149,9 +1220,9 @@ const urge = {
         // update button
         const btn = document.getElementById('senses-btn');
         if (this.tappedSenses < step.count) {
-            btn.innerText = `Got one (${this.tappedSenses}/${step.count})`;
+            btn.innerText = `Found one!`;
         } else {
-            btn.innerText = (this.currentSenseIndex < 4) ? "Next sense" : "I feel steadier";
+            btn.innerText = (this.currentSenseIndex < 4) ? "Next one!" : "Done";
         }
     },
 
@@ -1197,10 +1268,10 @@ const urge = {
         document.getElementById('surf-progress-ring').style.strokeDashoffset = offset;
 
         // phase text
-        let phaseLabel = "The urge is rising. Let it, don't fight it.";
-        if (progress >= 0.9) phaseLabel = "Almost through. You didn't act on it.";
-        else if (progress >= 0.6) phaseLabel = "It's starting to fade. Stay with it.";
-        else if (progress >= 0.35) phaseLabel = "Near the peak. Notice it without acting.";
+        let phaseLabel = "The wave is building: just watch. You don't have to do anything.";
+        if (progress >= 0.9) phaseLabel = "Almost through.";
+        else if (progress >= 0.6) phaseLabel = "It's getting quieter now. You didn't act on it.";
+        else if (progress >= 0.35) phaseLabel = "Near the top of the wave. You're okay.";
 
         document.getElementById('surf-label').innerText = phaseLabel;
     },
@@ -1210,20 +1281,20 @@ const urge = {
         this.isSurfing = !this.isSurfing;
 
         if (this.isSurfing) {
-            document.getElementById('surf-btn').innerText = "Pause";
+            document.getElementById('surf-btn').innerText = "Take a break";
             this.surfInterval = setInterval(() => {
                 this.surfElapsed++;
                 this.renderSurf();
                 if (this.surfElapsed >= this.surfDuration) {
                     this.isSurfing = false;
                     clearInterval(this.surfInterval);
-                    document.getElementById('surf-btn').innerText = "Finish";
+                    document.getElementById('surf-btn').innerText = "You made it! 🌟";
                     if (navigator.vibrate) navigator.vibrate([50, 100, 50]);
                 }
             }, 1000);
         } else {
             clearInterval(this.surfInterval);
-            document.getElementById('surf-btn').innerText = (this.surfElapsed >= this.surfDuration) ? "Finish" : "Resume";
+            document.getElementById('surf-btn').innerText = (this.surfElapsed >= this.surfDuration) ? "You made it! 🌟" : "Keep going";
             if (this.surfElapsed >= this.surfDuration) this.close();
         }
     },
@@ -1283,9 +1354,9 @@ function initNotifications() {
         if (currentTime === targetTime && lastNotified !== todayDate) {
             // It's time!
             if ("Notification" in window && Notification.permission === "granted") {
-                new Notification("Klara", {
-                    body: "Time for your daily check-in. Take a moment to reflect on your progress.",
-                    icon: "icon.png" // optional, assuming there's an icon
+                new Notification("", {
+                    body: "How are you doing today? Take a moment to check in with yourself.",
+                    icon: "icon.png"
                 });
                 localStorage.setItem("klara_last_notified_date", todayDate);
             }
